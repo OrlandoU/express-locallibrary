@@ -24,6 +24,16 @@ AuthorSchema.virtual("name").get(function () {
     return fullname;
 });
 
+AuthorSchema.virtual('date_of_birth_input').get(function(){
+    if (!this.date_of_birth) return ''
+    return new Date(this.date_of_birth).toISOString().split('T')[0]
+})
+
+AuthorSchema.virtual('date_of_death_input').get(function () {
+    if (!this.date_of_death) return ''
+    return new Date(this.date_of_death).toISOString().split('T')[0]
+})
+
 // Virtual for author's URL
 AuthorSchema.virtual("url").get(function () {
     // We don't use an arrow function as we'll need the this object

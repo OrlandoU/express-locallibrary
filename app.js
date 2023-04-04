@@ -3,8 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const helmet = require('helmet')
+const compression = require('compression')
 const mongoose = require('mongoose')
-
+const RateLimit = require('express-rate-limit')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog')
@@ -15,6 +17,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+})
+
+app.use(limiter)
+app.use(helmet())
+app.use(compression())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -27,7 +37,8 @@ app.use('/catalog', catalogRouter)
 
 //Set connection to db
 mongoose.set('strictQuery', false)
-const mongoDbConnectionString = 'mongodb+srv://orlando:Adeus2003@cluster0.xzhigzf.mongodb.net/local_library?retryWrites=true&w=majority'
+const mongoDbConnectionString = process.env.MONGODB_URI
+
 
 main().catch(err=>console.log(err))
 async function main(){
